@@ -1,5 +1,6 @@
 import createError from 'http-errors';
 import express, { json, urlencoded} from 'express';
+import cors from 'cors';
 import { join } from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
@@ -32,6 +33,7 @@ var app = express();
 // app.set('views', join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
+app.use(cors());
 app.use(logger('dev'));
 app.use(json());
 app.use(urlencoded({ extended: false }));
