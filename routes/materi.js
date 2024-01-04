@@ -8,7 +8,7 @@ import {plainToClass, plainToInstance} from 'class-transformer';
 var router = express.Router();
 
 /* GET users listing. */
-router.get('/', async function(req, res, next) {
+router.get('/download/:fileName', async function(req, res, next) {
   console.log('materi');
   try{
     var t = await loginUtils.getUsers();
@@ -18,6 +18,20 @@ router.get('/', async function(req, res, next) {
     next(err);
   }
 });
+
+
+router.get('/download/:fileUrl', async function (req, res, next) {
+     var result = new responseModel();
+     try {
+          const url = req.params.fileUrl;
+          result.body = await userQuizUtils.getLeaderBoardsByMateri(materiCode);
+     } catch (exc) {
+          result.message = exc;
+     }
+     res.end(JSON.stringify(result));
+});
+
+
 
 router.post('/login',async function(req,res,next){
      var result = new responseModel();

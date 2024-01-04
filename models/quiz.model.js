@@ -118,7 +118,7 @@ export default class QuizModel {
       },
       IsDeleted: {
         type: DataTypes.BOOLEAN,
-      },
+      }
     });
   };
 }

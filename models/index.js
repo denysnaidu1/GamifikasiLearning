@@ -2,6 +2,7 @@ import { default as dbConfig } from "../db_config.js";
 import { Sequelize } from "sequelize";
 import QuizModel from "./quiz.model.js";
 import UserQuizModel from "./userquiz.model.js";
+import MateriModel from "./materi.model.js";
 
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
@@ -27,6 +28,15 @@ db.QuizQuestionDetail = quizModel.QuizQuestionDetail;
 
 const userQuizModel = new UserQuizModel(sequelize,Sequelize);
 db.UserQuiz = userQuizModel.UserQuiz;
+
+const materiModel = new MateriModel(sequelize,Sequelize);
+db.Materi = materiModel.Materi;
+
+db.Materi.hasMany(db.Quiz,{as:"quizes"});
+db.Quiz.belongsTo(db.Materi,{
+     foreignKey:"MateriId",
+     as:"materi"
+});
 
 db.Quiz.hasMany(db.QuizQuestion,{as:"quizQuestions"});
 db.QuizQuestion.belongsTo(db.Quiz,{
