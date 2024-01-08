@@ -10,6 +10,7 @@ export default class MateriModel {
       Id: {
         type: DataTypes.BIGINT,
         primaryKey: true,
+        autoIncrement:true
       },
       Name: {
         type: DataTypes.STRING,

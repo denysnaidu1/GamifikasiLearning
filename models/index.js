@@ -33,6 +33,8 @@ db.UserQuizDetail = userQuizModel.UserQuizDetail;
 const materiModel = new MateriModel(sequelize,Sequelize);
 db.Materi = materiModel.Materi;
 
+db.Materi.hasMany(db.Materi,{as:'children',foreignKey:'ParentMateriId'});
+
 db.Materi.hasMany(db.Quiz,{as:"quizes"});
 db.Quiz.belongsTo(db.Materi,{
      foreignKey:"MateriId",

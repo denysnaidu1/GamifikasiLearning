@@ -1,67 +1,50 @@
 import express from 'express'
 import loginUtils from '../controllers/auth/auth.js';
-import {LoginModel} from '../models/userModel.js'
+import materiUtils from '../controllers/materi.controller.js';
+import { LoginModel } from '../models/userModel.js'
 import responseModel from '../models/responseModel.js';
 import constants from '../utils/constants.js';
-import {plainToClass, plainToInstance} from 'class-transformer';
+import { plainToClass, plainToInstance } from 'class-transformer';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import { promises as fsPromises } from 'fs';
 
 var router = express.Router();
 
 /* GET users listing. */
-router.get('/download/:fileName', async function(req, res, next) {
-  console.log('materi');
-  try{
-    var t = await loginUtils.getUsers();
-    res.json(t);
-  }catch(err){
-    console.log(err.message);
-    next(err);
-  }
-});
-
-
-router.get('/download/:fileUrl', async function (req, res, next) {
+router.get('/details/:materiCode', async function (req, res, next) {
      var result = new responseModel();
      try {
-          const url = req.params.fileUrl;
-          result.body = await userQuizUtils.getLeaderBoardsByMateri(materiCode);
+          var materiCode = req.params.materiCode;
+          result.body = await materiUtils.getMateriByCode(materiCode);
      } catch (exc) {
           result.message = exc;
      }
      res.end(JSON.stringify(result));
+})
+
+router.get('/download/:fileUrl', async function (req, res, next) {
+     try {
+          const fileUrl = req.params.fileUrl;
+          const __filename = fileURLToPath(import.meta.url);
+          const __dirname = dirname(__filename);
+          const folderPath = join(__dirname, '..', 'materi_files');
+          const filePath = join(folderPath, fileUrl);
+
+          await fsPromises.access(filePath, fsPromises.constants.F_OK);
+          res.download(filePath, function (err) {
+               if (err) {
+                    throw err;
+               }
+          })
+     } catch (exc) {
+          let err = exc;
+          if (exc.code === 'ENOENT') {
+               err = `File doesn't exist`;
+          }
+          res.status(constants.STATUS_CODE_INVALID_USER_REQUEST).send(err);
+     }
 });
 
-
-
-router.post('/login',async function(req,res,next){
-     var result = new responseModel();
-     try{
-          const model = plainToInstance(LoginModel,req.body);
-          result.message = await loginUtils.login(model);
-          if(result.message!=constants.STATUS_OK){
-               throw result.message;
-          }
-     }catch(err){
-          result.message = err.message??err;
-          result.statusCode = constants.STATUS_CODE_VALIDATION_ERROR;
-     }
-     res.end(JSON.stringify(result));
-})
-
-
-router.post('/register',async function(req,res,next){
-     var result = new responseModel();
-     try{
-          const model = plainToInstance(LoginModel,req.body);
-          result.message = await loginUtils.register(model);
-          if(result.message!=constants.STATUS_OK){
-               throw result.message;
-          }
-     }catch(err){
-          result.message = err.message??err;
-          result.statusCode = constants.STATUS_CODE_VALIDATION_ERROR;
-     }
-     res.end(JSON.stringify(result));
-})
 
 export default router;
