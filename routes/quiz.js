@@ -38,15 +38,13 @@ router.post('/submit',async function(req,res,next){
      var result = new responseModel();
      try{
           const model = plainToInstance(QuizViewModel,req.body);
-          console.log(model);
-          console.log(model.quizQuestions[0].quizQuestionDetails);
           
-          // result.message = await loginUtils.login(model);
-          // if(result.message!=constants.STATUS_OK){
-          //      throw result.message;
-          // }
-     }catch(err){
-          result.message = err.message??err;
+          result.message = await quizUtils.saveQuiz(model);
+          if(result.message!=constants.STATUS_OK){
+               throw result.message;
+          }
+     }catch(exc){
+          result.message = exc;
           result.statusCode = constants.STATUS_CODE_VALIDATION_ERROR;
      }
      res.end(JSON.stringify(result));

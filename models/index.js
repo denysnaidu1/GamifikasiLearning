@@ -28,6 +28,7 @@ db.QuizQuestionDetail = quizModel.QuizQuestionDetail;
 
 const userQuizModel = new UserQuizModel(sequelize,Sequelize);
 db.UserQuiz = userQuizModel.UserQuiz;
+db.UserQuizDetail = userQuizModel.UserQuizDetail;
 
 const materiModel = new MateriModel(sequelize,Sequelize);
 db.Materi = materiModel.Materi;
@@ -49,6 +50,14 @@ db.UserQuiz.belongsTo(db.Quiz,{
      foreignKey:"QuizId",
      as:"quiz"
 });
+
+db.UserQuiz.hasMany(db.UserQuizDetail,{as:"userQuizDetails"});
+db.UserQuizDetail.belongsTo(db.UserQuiz,{
+     foreignKey:"UserQuizId",
+     as:"userQuiz"
+});
+
+
 
 db.QuizQuestion.hasMany(db.QuizQuestionDetail,{as:"quizQuestionDetails"});
 db.QuizQuestionDetail.belongsTo(db.QuizQuestion,{
