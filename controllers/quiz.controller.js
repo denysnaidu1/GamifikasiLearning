@@ -77,7 +77,7 @@ export default class quizUtils {
             dbUserQuizDetails.push(model);
           });
 
-          var totalScore = correctCount / totalQuestion;
+          var totalScore = correctCount / totalQuestion * 10;
 
           var userQuizModel = {
             QuizId: quizViewModel.Id,
@@ -103,7 +103,7 @@ export default class quizUtils {
     } catch (err) {
       return err;
     }
-    
+
     return constants.STATUS_OK;
   }
 }
