@@ -10,7 +10,7 @@ export default class materiUtils {
       where:{Name:materiCode},
       include:[
         {
-          model:materi,as:'children',
+          model:materi,as:'subMateries',
           attributes:["Name","Title","Content"],
           where:{
             IsDeleted:false
