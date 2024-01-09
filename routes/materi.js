@@ -16,7 +16,7 @@ router.get('/details/:materiCode', async function (req, res, next) {
      var result = new responseModel();
      try {
           var materiCode = req.params.materiCode;
-          result.body = await materiUtils.getMateriByCode(materiCode);
+          result.body = await materiUtils.getMateriDetails(materiCode);
      } catch (exc) {
           result.message = exc;
      }

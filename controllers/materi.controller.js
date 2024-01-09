@@ -5,13 +5,20 @@ import QuizModel from "../models/quiz.model.js";
 const materi = db.Materi;
 export default class materiUtils {
 
-  static async getMateriByCode(materiCode){
+  static async getMateriDetails(materiCode){
     return await materi.findOne({
       where:{Name:materiCode},
       include:[
         {
           model:materi,as:'children',
           attributes:["Name","Title","Content"],
+          where:{
+            IsDeleted:false
+          }
+        },
+        {
+          association:"quizes",
+          attributes:["Id","Title","TimeLimit",],
           where:{
             IsDeleted:false
           }
