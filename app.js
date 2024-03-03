@@ -10,7 +10,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import indexRouter from './routes/index.js';
-import usersRouter from './routes/users.js';
+import usersRouter from './routes/user.js';
 import authRouter from './routes/auth.js';
 import quizRouter from './routes/quiz.js';
 import materiRouter from './routes/materi.js';
@@ -42,7 +42,7 @@ app.use(cookieParser());
 //app.use((join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/user', usersRouter);
 app.use('/auth',authRouter);
 app.use('/quiz',quizRouter);
 app.use('/materi',materiRouter);

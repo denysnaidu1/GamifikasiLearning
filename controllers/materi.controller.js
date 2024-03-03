@@ -12,9 +12,19 @@ export default class materiUtils {
         {
           model:materi,as:'subMateries',
           attributes:["Name","Title","Content"],
+          required:false,
           where:{
             IsDeleted:false
-          }
+          },
+          include:[
+            {
+              association:"quizes",
+              attributes:["Id","Title","TimeLimit",],
+              where:{
+                IsDeleted:false
+              }
+            }
+          ]
         },
         {
           association:"quizes",

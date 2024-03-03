@@ -3,11 +3,12 @@ import { Sequelize } from "sequelize";
 import QuizModel from "./quiz.model.js";
 import UserQuizModel from "./userquiz.model.js";
 import MateriModel from "./materi.model.js";
+import UserModel from "./user.model.js";
 
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
   dialect: dbConfig.dialect,
-  operatorsAliases: false,
+  //operatorsAliases: false,
   port: 3306,
   pool: dbConfig.pool,
   define: {
@@ -20,6 +21,9 @@ const db = {};
 
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
+
+const userModel = new UserModel(sequelize, Sequelize);
+db.Users = userModel.User;
 
 const quizModel = new QuizModel(sequelize,Sequelize);
 db.Quiz = quizModel.Quiz;
@@ -34,7 +38,6 @@ const materiModel = new MateriModel(sequelize,Sequelize);
 db.Materi = materiModel.Materi;
 
 db.Materi.hasMany(db.Materi,{as:'subMateries',foreignKey:'ParentMateriId'});
-
 db.Materi.hasMany(db.Quiz,{as:"quizes"});
 db.Quiz.belongsTo(db.Materi,{
      foreignKey:"MateriId",
