@@ -82,9 +82,11 @@ export default class userUtils {
               if (row) throw "User NIK already registered";
 
               if (userViewModel.mode == constants.FORM_MODE_DELETE) data.IsDeleted = true;
-              data.NIK = userViewModel.NIK;
-              data.FullName = userViewModel.FullName;
-              data.Password = userViewModel.Password;
+              else{
+                data.NIK = userViewModel.NIK;
+                data.FullName = userViewModel.FullName;
+                data.Password = userViewModel.Password;
+              }
 
               await data.save();
             })
