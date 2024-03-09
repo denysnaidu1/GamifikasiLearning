@@ -15,7 +15,7 @@ export default class loginUtils {
           let result = constants.STATUS_OK;
           const data = await query(
                `SELECT * FROM Users
-               Where NIK=${loginModel.username} AND password=${loginModel.password}`
+               Where NIK=${loginModel.username} AND password=${loginModel.password} AND IsDeleted=0`
           );
           if(!data || data.length==0) result = "Invalid username/password";
           else{

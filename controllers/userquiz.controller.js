@@ -4,81 +4,148 @@ import QuizModel from "../models/quiz.model.js";
 
 const UserQuiz = db.UserQuiz;
 const quiz = db.Quiz;
+const materi = db.Materi;
 export default class userQuizUtils {
 
+  // static async getLeaderBoardsByMateri(materiCode) {
+  //   return await quiz.count({
+  //     include:[
+  //       {
+  //         association: "materi",
+  //         required:true,
+  //         where:{
+  //           Name:materiCode
+  //         }
+  //       }
+  //     ]
+  //   })
+  //   .then(async (count)=>{
+  //     await UserQuiz.findAll({
+  //       include: [
+  //         {
+  //           association: "quiz",
+  //           attributes: ["Title","TimeLimit"],
+  //           required:true,
+  //           order: [
+  //             ["quiz", literal("TotalScore"), "DESC"]
+  //           ],
+  //           include: [
+  //             {
+  //               association: "materi",
+  //               attributes:[],
+  //               required:true,
+  //               where:{
+  //                 Name:materiCode
+  //               }
+  //             }
+  //           ]
+  //         },
+  //       ],
+  //     })
+  //       .then((data) => {
+  //         return data;
+  //       })
+  //       .catch((err) => {
+  //         return err;
+  //       });
+  //   })
+  //   .catch((err)=>{
+  //     return err;
+  //   });
+  //   return await UserQuiz.findAll({
+  //     include: [
+  //       {
+  //         association: "quiz",
+  //         attributes: ["Title","TimeLimit"],
+  //         required:true,
+  //         order: [
+  //           ["quiz", "TotalScore", "DESC"]
+  //         ],
+  //         include: [
+  //           {
+  //             association: "materi",
+  //             attributes:[],
+  //             required:true,
+  //             where:{
+  //               Name:materiCode
+  //             }
+  //           }
+  //         ]
+  //       },
+  //     ],
+  //   })
+  //     .then((data) => {
+  //       return data;
+  //     })
+  //     .catch((err) => {
+  //       return err;
+  //     });
+  // }
+
   static async getLeaderBoardsByMateri(materiCode) {
-    return await quiz.count({
-      include:[
-        {
-          association: "materi",
-          required:true,
-          where:{
-            Name:materiCode
-          }
-        }
-      ]
+    var result = null;
+    await materi.findOne({
+      attributes: ["Id"],
+      where: {
+        Name: materiCode,
+        IsDeleted: false
+      }
     })
-    .then(async (count)=>{
-      await UserQuiz.findAll({
-        include: [
-          {
-            association: "quiz",
-            attributes: ["Title","TimeLimit"],
-            required:true,
-            order: [
-              ["quiz", literal("TotalScore"), "DESC"]
-            ],
-            include: [
-              {
-                association: "materi",
-                attributes:[],
-                required:true,
-                where:{
-                  Name:materiCode
-                }
-              }
-            ]
-          },
-        ],
-      })
-        .then((data) => {
-          return data;
-        })
-        .catch((err) => {
-          return err;
-        });
-    })
-    .catch((err)=>{
-      return err;
-    });
-    return await UserQuiz.findAll({
-      include: [
-        {
-          association: "quiz",
-          attributes: ["Title","TimeLimit"],
-          required:true,
-          order: [
-            ["quiz", "TotalScore", "DESC"]
-          ],
+      .then(async (data) => {
+        var materiId = data.Id;
+        await quiz.count({
           include: [
             {
               association: "materi",
-              attributes:[],
-              required:true,
-              where:{
-                Name:materiCode
+              required: true,
+              where: {
+                Name: materiCode,
+                [Op.or]: [{ ParentMateriId: materiId }]
               }
             }
           ]
-        },
-      ],
-    })
-      .then((data) => {
-        return data;
+        })
+          .then(async (count) => {
+            await UserQuiz.findAll({
+              include: [
+                {
+                  association: "quiz",
+                  attributes: ["Title", "TimeLimit"],
+                  required: true,
+                  order: [
+                    ["quiz", literal("TotalScore"), "DESC"]
+                  ],
+                  include: [
+                    {
+                      association: "materi",
+                      attributes: [],
+                      required: true,
+                      where: {
+                        Name: materiCode,
+                        [Op.or]: [{ ParentMateriId: materiId }]
+                      }
+                    }
+                  ]
+                },
+              ],
+            })
+              .then((data) => {
+                result = data;
+              })
+              .catch((err) => {
+                throw err;
+              });
+          })
+          .catch((err) => {
+            throw err;
+          });
       })
       .catch((err) => {
-        return err;
-      });
+        result = err;
+      })
+
+
+    return result;
   }
 
   static async getLeaderBoards() {
@@ -86,9 +153,9 @@ export default class userQuizUtils {
       include: [
         {
           association: "quiz",
-          attributes: ["Title","TimeLimit"],
-          order:[
-               ["quiz","TotalScore","DESC"]
+          attributes: ["Title", "TimeLimit"],
+          order: [
+            ["quiz", "TotalScore", "DESC"]
           ]
         },
       ],

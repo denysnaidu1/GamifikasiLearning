@@ -11,6 +11,28 @@ import { promises as fsPromises } from 'fs';
 
 var router = express.Router();
 
+router.get('/admin/', async function (req, res, next) {
+     var result = new responseModel();
+     try {
+          result.body = await materiUtils.getAllMateries();
+     } catch (exc) {
+          result.message = exc;
+     }
+     res.end(JSON.stringify(result));
+})
+
+router.get('/admin/details/:id', async function (req, res, next) {
+     var result = new responseModel();
+     try {
+          const materiId = req.params.id;
+          result.body = await materiUtils.getAdminMateriDetails(materiId);
+     } catch (exc) {
+          result.message = exc;
+     }
+     res.end(JSON.stringify(result));
+})
+
+
 /* GET users listing. */
 router.get('/details/:materiCode', async function (req, res, next) {
      var result = new responseModel();

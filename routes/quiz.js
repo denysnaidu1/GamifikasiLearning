@@ -11,7 +11,7 @@ import { QuizViewModel } from '../viewModels/quizViewModel.js';
 var router = express.Router();
 
 //GET: All Quiz and QuizQuestion
-router.get('/', async function (req, res, next) {
+router.get('/admin/', async function (req, res, next) {
      var result = new responseModel();
      try {
           result.body = await quizUtils.getAllQuiz();
@@ -39,11 +39,28 @@ router.post('/submit',async function(req,res,next){
      try{
           const model = plainToInstance(QuizViewModel,req.body);
           
-          result.message = await quizUtils.saveQuiz(model);
+          result.message = await quizUtils.submitQuiz(model);
           if(result.message!=constants.STATUS_OK){
                throw result.message;
           }
      }catch(exc){
+          result.message = exc;
+          result.statusCode = constants.STATUS_CODE_VALIDATION_ERROR;
+     }
+     res.end(JSON.stringify(result));
+});
+
+router.post('/admin/submit',async function(req,res,next){
+     var result = new responseModel();
+     try{
+          const model = plainToInstance(QuizViewModel,req.body);
+          
+          result.message = await quizUtils.submitQuizAdmin(model);
+          if(result.message!=constants.STATUS_OK){
+               throw result.message;
+          }
+     }catch(exc){
+          console.log(exc);
           result.message = exc;
           result.statusCode = constants.STATUS_CODE_VALIDATION_ERROR;
      }
@@ -67,6 +84,7 @@ router.get('/leaderboard/:materiCode', async function (req, res, next) {
      try {
           const materiCode = req.params.materiCode;
           result.body = await userQuizUtils.getLeaderBoardsByMateri(materiCode);
+          console.log(result.body);
      } catch (exc) {
           result.message = exc;
      }

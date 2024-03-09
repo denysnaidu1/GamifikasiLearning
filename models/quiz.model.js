@@ -10,6 +10,7 @@ export default class QuizModel {
       Id: {
         type: DataTypes.BIGINT,
         primaryKey: true,
+        autoIncrement: true
       },
       MateriId: {
         type: DataTypes.BIGINT,
@@ -49,6 +50,7 @@ export default class QuizModel {
       Id: {
         type: DataTypes.BIGINT,
         primaryKey: true,
+        autoIncrement: true
       },
       QuizId: {
         type: DataTypes.BIGINT,
@@ -85,6 +87,7 @@ export default class QuizModel {
       Id: {
         type: DataTypes.BIGINT,
         primaryKey: true,
+        autoIncrement: true
       },
       QuizQuestionId: {
         type: DataTypes.BIGINT,
