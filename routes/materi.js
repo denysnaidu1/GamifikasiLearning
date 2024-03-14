@@ -1,4 +1,5 @@
-import express from 'express'
+import express from 'express';
+import multer from 'multer';
 import loginUtils from '../controllers/auth/auth.js';
 import materiUtils from '../controllers/materi.controller.js';
 import { LoginModel } from '../models/userModel.js'
@@ -8,6 +9,17 @@ import { plainToClass, plainToInstance } from 'class-transformer';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { promises as fsPromises } from 'fs';
+
+const storage = multer.diskStorage({
+     destination: (req, file, cb) => {
+          cb(null, 'materi_files/') // Directory where files will be saved
+     },
+     filename: (req, file, cb) => {
+          cb(null, file.fieldname + '-' + Date.now() + '-' + file.originalname) // Naming convention for saved files
+     }
+});
+
+const upload = multer({ storage: storage });
 
 var router = express.Router();
 
@@ -31,6 +43,24 @@ router.get('/admin/details/:id', async function (req, res, next) {
      }
      res.end(JSON.stringify(result));
 })
+
+router.post('/admin/submit', upload.array('files'), async function (req, res, next) {
+     var result = new responseModel();
+     try {
+          console.log(req.files, req.body);
+          // const model = plainToInstance(MateriViewModel, req.body);
+
+          // result.message = await quizUtils.submitQuizAdmin(model);
+          // if (result.message != constants.STATUS_OK) {
+          //      throw result.message;
+          // }
+     } catch (exc) {
+          console.log(exc);
+          result.message = exc;
+          result.statusCode = constants.STATUS_CODE_VALIDATION_ERROR;
+     }
+     res.end(JSON.stringify(result));
+});
 
 
 /* GET users listing. */

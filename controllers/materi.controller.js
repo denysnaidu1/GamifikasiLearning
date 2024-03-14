@@ -125,7 +125,7 @@ export default class materiUtils {
       where: { Name: materiCode },
       include: [
         {
-          model: materi, as: 'subMateries',
+          model: Materi, as: 'subMateries',
           attributes: ["Name", "Title", "Content"],
           required: false,
           where: {
