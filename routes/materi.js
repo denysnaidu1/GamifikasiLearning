@@ -2,6 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import loginUtils from '../controllers/auth/auth.js';
 import materiUtils from '../controllers/materi.controller.js';
+import MateriViewModel from '../viewModels/materiViewModel.js';
 import { LoginModel } from '../models/userModel.js'
 import responseModel from '../models/responseModel.js';
 import constants from '../utils/constants.js';
@@ -15,7 +16,7 @@ const storage = multer.diskStorage({
           cb(null, 'materi_files/') // Directory where files will be saved
      },
      filename: (req, file, cb) => {
-          cb(null, file.fieldname + '-' + Date.now() + '-' + file.originalname) // Naming convention for saved files
+          cb(null, file.originalname) // Naming convention for saved files
      }
 });
 
@@ -44,17 +45,29 @@ router.get('/admin/details/:id', async function (req, res, next) {
      res.end(JSON.stringify(result));
 })
 
-router.post('/admin/submit', upload.array('files'), async function (req, res, next) {
+router.post('/admin/submit', upload.any(), async function (req, res, next) {
      var result = new responseModel();
      try {
-          console.log(req.files, req.body);
-          // const model = plainToInstance(MateriViewModel, req.body);
-
-          // result.message = await quizUtils.submitQuizAdmin(model);
-          // if (result.message != constants.STATUS_OK) {
-          //      throw result.message;
-          // }
+          const transformedBody = transformRequestBody(req.body);
+          const model = plainToInstance(MateriViewModel, transformedBody);
+          req.files.forEach((file)=>{
+               if(file.fieldname == "file"){
+                    model.Content = file.originalname;
+               }
+               else{
+                    const match = file.fieldname.match(/subMateries\[(\d+)\]\.file/);
+                    const index = match[1];
+                    model.subMateries[index].Content = file.originalname;
+               }
+          })
+          result.message = await materiUtils.submit(model);
+          if (result.message != constants.STATUS_OK) {
+               throw result.message;
+          }
      } catch (exc) {
+          req.files.forEach((file)=>{
+               fsPromises.unlink(file.path);
+          })
           console.log(exc);
           result.message = exc;
           result.statusCode = constants.STATUS_CODE_VALIDATION_ERROR;
@@ -78,6 +91,7 @@ router.get('/details/:materiCode', async function (req, res, next) {
 router.get('/download/:fileUrl', async function (req, res, next) {
      try {
           const fileUrl = req.params.fileUrl;
+          console.log(fileUrl);
           const __filename = fileURLToPath(import.meta.url);
           const __dirname = dirname(__filename);
           const folderPath = join(__dirname, '..', 'materi_files');
@@ -98,5 +112,35 @@ router.get('/download/:fileUrl', async function (req, res, next) {
      }
 });
 
+function transformRequestBody(flatObject) {
+     const result = {};
+ 
+     Object.entries(flatObject).forEach(([key, value]) => {
+          // Preserve null values as null
+          if (value === 'null') {
+              value = null;
+          }
+  
+          const parts = key.split(/[\.\[\]]/).filter(part => part !== '');
+          let currentLevel = result;
+  
+          parts.forEach((part, index) => {
+              // Check if we're at the last part of the key
+              if (index === parts.length - 1) {
+                  // Assign the value directly
+                  currentLevel[part] = value;
+              } else {
+                  // Prepare for the next level of nesting
+                  const nextPartIsArray = parts[index + 1].match(/^\d+$/) !== null;
+                  if (!currentLevel[part]) {
+                      currentLevel[part] = nextPartIsArray ? [] : {};
+                  }
+                  currentLevel = currentLevel[part];
+              }
+          });
+      });
+ 
+     return result;
+ }
 
 export default router;

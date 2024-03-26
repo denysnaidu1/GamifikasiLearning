@@ -8,4 +8,4 @@ class MateriViewModel {
   mode = ""
 }
 
-export { MateriViewModel };
+export default MateriViewModel;

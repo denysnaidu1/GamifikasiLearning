@@ -4,6 +4,7 @@ import QuizModel from "../models/quiz.model.js";
 import constants from "../utils/constants.js";
 
 const Materi = db.Materi;
+const sequelize = db.sequelize;
 export default class materiUtils {
 
   static async getAllMateries() {
@@ -40,7 +41,7 @@ export default class materiUtils {
       })
   }
 
-  static async create(materiViewModel){
+  static async create(materiViewModel) {
     try {
       await Materi.findOne({
         where: {
@@ -58,7 +59,7 @@ export default class materiUtils {
               ParentMateriId: materiViewModel.ParentMateriId,
               Name: materiViewModel.Name,
               Title: materiViewModel.Title,
-              //Content: quizViewModel.TimeLimit,
+              Content: materiViewModel.Content,
               CreatedBy: 'test',
               CreatedDate: literal('CURRENT_TIMESTAMP'),
               IsDeleted: false
@@ -66,15 +67,17 @@ export default class materiUtils {
 
             var materi = await Materi.create(
               materiModel,
-              {transaction:t}
+              { transaction: t }
             );
 
-            for(let subMateri of materi.subMateries){
+            console.log(materi.Id);
+
+            for (let subMateri of materiViewModel.subMateries) {
               var subMateriModel = {
                 ParentMateriId: materi.Id,
                 Name: subMateri.Name,
                 Title: subMateri.Title,
-                //Content: quizViewModel.TimeLimit,
+                Content: subMateri.Content,
                 CreatedBy: 'test',
                 CreatedDate: literal('CURRENT_TIMESTAMP'),
                 IsDeleted: false
@@ -82,9 +85,9 @@ export default class materiUtils {
 
               await Materi.create(
                 subMateriModel,
-                {transaction:t}
+                { transaction: t }
               );
-  
+
             }
 
             await t.commit();
@@ -103,19 +106,109 @@ export default class materiUtils {
     return constants.STATUS_OK;
   }
 
-  static async update(materiViewModel){
+  static async update(materiViewModel) {
+    try {
+      const t = await sequelize.transaction();
+      try {
+        await Materi
+          .findByPk(materiViewModel.Id, { transaction: t })
+          .then(async (data) => {
+            if (!data) throw "Invalid  Materi";
 
+            if (data.mode == constants.FORM_MODE_DELETE) {
+              data.IsDeleted = true;
+            }
+            else {
+              data.Name = materiViewModel.Name;
+              data.ParentMateriId = materiViewModel.ParentMateriId;
+              data.Content = materiViewModel.Content;
+              data.Title = materiViewModel.Title;
+            }
+
+            await data.save({ transaction: t });
+
+            for (let subMateri of materiViewModel.subMateries) {
+              if (subMateri.mode == constants.FORM_MODE_CREATE) {
+                await Materi
+                  .findOne({
+                    where: {
+                      Name: materiViewModel.Name,
+                      ParentMateriId: materiViewModel.ParentMateriId,
+                      IsDeleted: false
+                    }
+                  }, { transaction: t })
+                  .then(async (subMateriModel) => {
+                    if (subMateriModel) {
+                      subMateriModel.ParentMateriId = data.Id;
+                      await subMateriModel.save({ transaction: t });
+                    }
+                    else {
+                      var subMateriModel = {
+                        ParentMateriId: data.Id,
+                        Name: subMateri.Name,
+                        Title: subMateri.Title,
+                        Content: subMateri.Content,
+                        CreatedBy: 'test',
+                        CreatedDate: literal('CURRENT_TIMESTAMP'),
+                        IsDeleted: false
+                      };
+
+                      await Materi.create(
+                        subMateriModel,
+                        { transaction: t }
+                      );
+                    }
+                  })
+              }
+              else {
+                await Materi
+                  .findByPk(subMateri.Id, { transaction: t })
+                  .then(async (subMateriModel) => {
+                    if (!subMateriModel) throw `Invalid  SubMateri ${subMateri.Name}`;
+
+                    if (subMateri.mode == constants.FORM_MODE_DELETE) {
+                      subMateriModel.IsDeleted = true;
+                    }
+                    else {
+                      subMateriModel.Name = materiViewModel.Name;
+                      subMateriModel.Content = materiViewModel.Content;
+                      subMateriModel.Title = materiViewModel.Title;
+                    }
+
+                    await subMateriModel.save({ transaction: t });
+                  })
+                  .catch((err) => {
+                    throw err;
+                  })
+              }
+
+            }
+          })
+          .catch((err) => {
+            throw err;
+          })
+      } catch (err) {
+        await t.rollback();
+        throw err;
+      }
+
+      await t.commit();
+    } catch (err) {
+      return err;
+    }
+
+    return constants.STATUS_OK;
   }
 
-  static async submit(materiViewModel){
-    try{
-      if(materiViewModel.mode == constants.FORM_MODE_CREATE){
+  static async submit(materiViewModel) {
+    try {
+      if (materiViewModel.mode == constants.FORM_MODE_CREATE) {
         return await this.create(materiViewModel);
       }
-      else{
+      else {
         return await this.update(materiViewModel);
       }
-    }catch(err){
+    } catch (err) {
       return err;
     }
   }
@@ -134,7 +227,8 @@ export default class materiUtils {
           include: [
             {
               association: "quizes",
-              attributes: ["Id", "Title", "TimeLimit",],
+              attributes: ["Id", "Title", "TimeLimit"],
+              required: false,
               where: {
                 IsDeleted: false
               }
@@ -143,7 +237,8 @@ export default class materiUtils {
         },
         {
           association: "quizes",
-          attributes: ["Id", "Title", "TimeLimit",],
+          attributes: ["Id", "Title", "TimeLimit"],
+          required: false,
           where: {
             IsDeleted: false
           }
