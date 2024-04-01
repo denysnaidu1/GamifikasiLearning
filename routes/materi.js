@@ -50,24 +50,28 @@ router.post('/admin/submit', upload.any(), async function (req, res, next) {
      try {
           const transformedBody = transformRequestBody(req.body);
           const model = plainToInstance(MateriViewModel, transformedBody);
-          req.files.forEach((file)=>{
-               if(file.fieldname == "file"){
-                    model.Content = file.originalname;
-               }
-               else{
-                    const match = file.fieldname.match(/subMateries\[(\d+)\]\.file/);
-                    const index = match[1];
-                    model.subMateries[index].Content = file.originalname;
-               }
-          })
+          if(req.files){
+               req.files.forEach((file)=>{
+                    if(file.fieldname == "file"){
+                         model.Content = file.originalname;
+                    }
+                    else{
+                         const match = file.fieldname.match(/subMateries\[(\d+)\]\.file/);
+                         const index = match[1];
+                         model.subMateries[index].Content = file.originalname;
+                    }
+               })
+          }
           result.message = await materiUtils.submit(model);
           if (result.message != constants.STATUS_OK) {
                throw result.message;
           }
      } catch (exc) {
-          req.files.forEach((file)=>{
-               fsPromises.unlink(file.path);
-          })
+          if(req.files){
+               req.files.forEach((file)=>{
+                    fsPromises.unlink(file.path);
+               })
+          }
           console.log(exc);
           result.message = exc;
           result.statusCode = constants.STATUS_CODE_VALIDATION_ERROR;
