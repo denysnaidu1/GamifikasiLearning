@@ -4,7 +4,7 @@ const db_config = {
      PASSWORD:"12345678",
      DB:"elearning",
      dialect: "mysql",
-     port:3306,
+     port:80,
      pool:{
           max:5,
           min:0,
