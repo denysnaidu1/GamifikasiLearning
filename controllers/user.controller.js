@@ -19,11 +19,11 @@ export default class userUtils {
       })
   }
 
-  static async getUserDetails(nik) {
+  static async getUserDetails(nisn) {
     return await Users.findOne({
-      attributes: ["UserId", "NIK", "FullName", "IsDeleted"],
+      attributes: ["UserId", "NISN", "FullName", "IsDeleted"],
       where: {
-        NIK: nik
+        NISN: nisn
       }
     })
       .then((data) => {
@@ -38,14 +38,14 @@ export default class userUtils {
     try {
       await Users.findOne({
         where: {
-          NIK: userViewModel.NIK
+          NISN: userViewModel.NISN
         }
       })
         .then(async (data) => {
-          if (data) throw "User NIK already registered";
+          if (data) throw "User NISN already registered";
 
           var userModel = {
-            NIK: userViewModel.NIK,
+            NISN: userViewModel.NISN,
             FullName: userViewModel.FullName,
             Password: userViewModel.Password,
             IsDeleted: false
@@ -74,16 +74,16 @@ export default class userUtils {
 
           await Users.findOne({
             where: {
-              NIK: userViewModel.NIK,
+              NISN: userViewModel.NISN,
               [Op.not]: [{ UserId: userViewModel.UserId }]
             }
           })
             .then(async (row) => {
-              if (row) throw "User NIK already registered";
+              if (row) throw "User NISN already registered";
 
               if (userViewModel.mode == constants.FORM_MODE_DELETE) data.IsDeleted = true;
-              else{
-                data.NIK = userViewModel.NIK;
+              else {
+                data.NISN = userViewModel.NISN;
                 data.FullName = userViewModel.FullName;
                 data.Password = userViewModel.Password;
               }

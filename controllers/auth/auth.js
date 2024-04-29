@@ -12,14 +12,14 @@ export default class loginUtils {
      }
      
      static async login (loginModel){
-          let result = constants.STATUS_OK;
+          const result = {data:null,message:constants.STATUS_OK};
           const data = await query(
-               `SELECT * FROM Users
-               Where NIK=${loginModel.username} AND password=${loginModel.password} AND IsDeleted=0`
+               `SELECT UserId,NISN,FullName, IsAdmin FROM Users
+               Where NISN=${loginModel.username} AND password=${loginModel.password} AND IsDeleted=0`
           );
-          if(!data || data.length==0) result = "Invalid username/password";
+          if(!data || data.length==0) result.message = "Invalid username/password";
           else{
-               
+               result.data = data;
           }
           return result;
      }
@@ -46,7 +46,7 @@ export default class loginUtils {
 
                const existingData = await query(
                     `SELECT * FROM Users
-                    Where NIK = '${loginModel.username}'`
+                    Where NISN = '${loginModel.username}'`
                );
 
                if(existingData.length>0){

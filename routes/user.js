@@ -19,11 +19,11 @@ router.get('/', async function(req, res, next) {
 
 });
 
-router.get('/detail/:nik',async function(req,res,next){
+router.get('/detail/:nisn',async function(req,res,next){
   var result = new responseModel();
   try{
-    var userNik = req.params.nik;
-    result.body = await userUtils.getUserDetails(userNik);
+    var userNisn = req.params.nisn;
+    result.body = await userUtils.getUserDetails(userNisn);
   }catch(exc){
     result.message = exc;
   }

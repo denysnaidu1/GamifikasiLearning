@@ -9,7 +9,7 @@ export default class UserModel {
         type: DataTypes.BIGINT,
         primaryKey: true,
       },
-      NIK: {
+      NISN: {
         type: DataTypes.STRING,
       },
       FullName: {

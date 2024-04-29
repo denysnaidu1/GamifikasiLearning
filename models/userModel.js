@@ -1,12 +1,12 @@
 class UserModel {
      UserId=0
-     NIK=""
+     NISN=""
      FullName=""
 }
 
 class LoginModel{
      username=""
-     nik=""
+     nisn=""
      password=""
      name=""
 }

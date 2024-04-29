@@ -48,6 +48,8 @@ router.get('/admin/details/:id', async function (req, res, next) {
 router.post('/admin/submit', upload.any(), async function (req, res, next) {
      var result = new responseModel();
      try {
+          var username = req.get("username");
+          console.log(username);
           const transformedBody = transformRequestBody(req.body);
           const model = plainToInstance(MateriViewModel, transformedBody);
           if(req.files){

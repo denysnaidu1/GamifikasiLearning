@@ -1,5 +1,6 @@
 import express from 'express'
 import loginUtils from '../controllers/auth/auth.js';
+import authUtils from '../controllers/auth.controller.js';
 import {LoginModel} from '../models/userModel.js'
 import responseModel from '../models/responseModel.js';
 import constants from '../utils/constants.js';
@@ -23,10 +24,12 @@ router.post('/login',async function(req,res,next){
      var result = new responseModel();
      try{
           const model = plainToInstance(LoginModel,req.body);
-          result.message = await loginUtils.login(model);
+          var loginRes= await authUtils.login(model);
+          result.message = loginRes.message;
           if(result.message!=constants.STATUS_OK){
                throw result.message;
           }
+          result.body = loginRes.data;
      }catch(err){
           result.message = err.message??err;
           result.statusCode = constants.STATUS_CODE_VALIDATION_ERROR;
