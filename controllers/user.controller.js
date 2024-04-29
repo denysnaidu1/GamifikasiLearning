@@ -86,6 +86,7 @@ export default class userUtils {
                 data.NISN = userViewModel.NISN;
                 data.FullName = userViewModel.FullName;
                 data.Password = userViewModel.Password;
+                data.IsAdmin = userViewModel.IsAdmin;
               }
 
               await data.save();

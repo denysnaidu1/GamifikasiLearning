@@ -18,6 +18,9 @@ export default class UserModel {
       Password:{
         type:DataTypes.STRING
       },
+      IsAdmin:{
+        type: DataTypes.BOOLEAN
+      },
       IsDeleted:{
         type: DataTypes.BOOLEAN
       }

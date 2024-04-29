@@ -3,6 +3,6 @@ export default class UserViewModel{
     NISN = 0
     FullName = 0
     Password=0
-
+    IsAdmin=false
     mode = ''
 }
