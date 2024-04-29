@@ -115,7 +115,7 @@ export default class materiUtils {
           .then(async (data) => {
             if (!data) throw "Invalid  Materi";
 
-            if (data.mode == constants.FORM_MODE_DELETE) {
+            if (materiViewModel.mode == constants.FORM_MODE_DELETE) {
               data.IsDeleted = true;
             }
             else {
@@ -132,8 +132,8 @@ export default class materiUtils {
                 await Materi
                   .findOne({
                     where: {
-                      Name: materiViewModel.Name,
-                      ParentMateriId: materiViewModel.ParentMateriId,
+                      Name: subMateri.Name,
+                      ParentMateriId: subMateri.ParentMateriId,
                       IsDeleted: false
                     }
                   }, { transaction: t })

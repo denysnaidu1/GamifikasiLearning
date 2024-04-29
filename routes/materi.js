@@ -62,6 +62,7 @@ router.post('/admin/submit', upload.any(), async function (req, res, next) {
                     }
                })
           }
+          console.log(model);
           result.message = await materiUtils.submit(model);
           if (result.message != constants.STATUS_OK) {
                throw result.message;
