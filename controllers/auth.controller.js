@@ -6,7 +6,6 @@ const Users = db.Users;
 export default class authUtils {
 
   static async login(loginModel) {
-    console.log(loginModel);
     var result = { data: null, message: constants.STATUS_OK };
     try {
       await Users.findOne({

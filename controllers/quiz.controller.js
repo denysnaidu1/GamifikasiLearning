@@ -61,7 +61,8 @@ export default class quizUtils {
       })
   }
 
-  static async submitQuiz(quizViewModel) {
+  static async submitQuiz(quizViewModel,username) {
+    const result = {data:null,message:constants.STATUS_OK};
     try {
       await Quiz
         .findByPk(quizViewModel.Id)
@@ -83,13 +84,13 @@ export default class quizUtils {
           });
 
           var totalScore = correctCount / totalQuestion * 100;
-
+          result.data = {totalScore:totalScore};
           var userQuizModel = {
             QuizId: quizViewModel.Id,
             TotalScore: totalScore,
             TotalCorrect: correctCount,
             FinishedTime: Date.now(),
-            CreatedBy: 'test',
+            CreatedBy: username,
             CreatedDate: Date.now(),
             IsDeleted: false,
             userQuizDetails: dbUserQuizDetails
@@ -105,10 +106,10 @@ export default class quizUtils {
           throw err;
         })
     } catch (err) {
-      return err;
+      result.message = err;
     }
 
-    return constants.STATUS_OK;
+    return result;
   }
 
   static async create(quizViewModel) {

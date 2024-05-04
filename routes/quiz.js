@@ -38,11 +38,16 @@ router.post('/submit',async function(req,res,next){
      var result = new responseModel();
      try{
           const model = plainToInstance(QuizViewModel,req.body);
-          
-          result.message = await quizUtils.submitQuiz(model);
+          const username = req.headers.username;
+          if(!username){
+               throw "Invalid headers"
+          }
+          var submitResult = await quizUtils.submitQuiz(model,username);
+          result.message = submitResult.message;
+          result.body = submitResult.data;
           if(result.message!=constants.STATUS_OK){
                throw result.message;
-          }
+          }      
      }catch(exc){
           result.message = exc;
           result.statusCode = constants.STATUS_CODE_VALIDATION_ERROR;

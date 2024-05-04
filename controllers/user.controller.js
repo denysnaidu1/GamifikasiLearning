@@ -48,7 +48,7 @@ export default class userUtils {
             NISN: userViewModel.NISN,
             FullName: userViewModel.FullName,
             Password: userViewModel.Password,
-            IsDeleted: false
+            IsDeleted: userViewModel.IsAdmin
           }
 
           await Users.create(
