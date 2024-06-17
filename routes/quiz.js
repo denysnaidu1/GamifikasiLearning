@@ -53,13 +53,14 @@ router.post('/submit',async function(req,res,next){
           result.statusCode = constants.STATUS_CODE_VALIDATION_ERROR;
      }
      res.end(JSON.stringify(result));
+
 });
 
 router.post('/admin/submit',async function(req,res,next){
      var result = new responseModel();
      try{
           const model = plainToInstance(QuizViewModel,req.body);
-          
+          console.log(model);
           result.message = await quizUtils.submitQuizAdmin(model);
           if(result.message!=constants.STATUS_OK){
                throw result.message;
@@ -70,6 +71,7 @@ router.post('/admin/submit',async function(req,res,next){
           result.statusCode = constants.STATUS_CODE_VALIDATION_ERROR;
      }
      res.end(JSON.stringify(result));
+
 });
 
 router.get('/leaderboard', async function (req, res, next) {

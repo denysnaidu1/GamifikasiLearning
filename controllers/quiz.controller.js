@@ -199,7 +199,7 @@ export default class quizUtils {
           .then(async (data) => {
             if (!data) throw "Invalid  Quiz";
   
-            if (data.mode == constants.FORM_MODE_DELETE) {
+            if (quizViewModel.mode == constants.FORM_MODE_DELETE) {
               data.IsDeleted = true;
             }
             else {
@@ -207,7 +207,7 @@ export default class quizUtils {
               data.Title = quizViewModel.Title;
               data.TimeLimit = quizViewModel.TimeLimit;
             }
-  
+  console.log(data);
             await data.save({ transaction: t });
   
             for (let question of quizViewModel.quizQuestions) {
