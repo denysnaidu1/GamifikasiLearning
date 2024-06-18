@@ -132,6 +132,9 @@ export default class userQuizUtils {
                   ]
                 },
               ],
+              where: {
+                IsDeleted: false
+              }
             })
               .then((data) => {
                 result = data;
@@ -166,6 +169,9 @@ export default class userQuizUtils {
           }
         },
       ],
+      where: {
+          IsDeleted: false
+      }
     })
       .then((data) => {
         return data;
