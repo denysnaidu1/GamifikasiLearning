@@ -100,7 +100,8 @@ export default class userQuizUtils {
               required: true,
               where: {
                 Name: materiCode,
-                [Op.or]: [{ ParentMateriId: materiId }]
+                [Op.or]: [{ ParentMateriId: materiId }],
+                IsDeleted: false
               }
             }
           ]
@@ -115,6 +116,9 @@ export default class userQuizUtils {
                   order: [
                     ["quiz", literal("TotalScore"), "DESC"]
                   ],
+                  where: {
+                    IsDeleted: false
+                  },
                   include: [
                     {
                       association: "materi",
@@ -156,7 +160,10 @@ export default class userQuizUtils {
           attributes: ["Title", "TimeLimit"],
           order: [
             ["quiz", "TotalScore", "DESC"]
-          ]
+          ],
+          where: {
+            IsDeleted: false
+          }
         },
       ],
     })
